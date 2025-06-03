@@ -24,7 +24,7 @@ Waze API → **Web Scraper** (Python) → **MongoDB** (`eventos_crudos`) → **F
 
 ## Instrucciones de Ejecución Completa del Pipeline
 
--Sigue estos pasos en orden desde la raíz del proyecto en tu terminal.
+-Sigue estos pasos en orden desde la raíz del proyecto en tu terminal.(Lo ideal es tener 4 terminales abiertas).
 
 **Paso 0: (Opcional) Limpieza Inicial Completa**
 Si deseas empezar desde cero (elimina todos los datos y contenedores previos del proyecto):
