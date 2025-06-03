@@ -24,7 +24,7 @@ Waze API → **Web Scraper** (Python) → **MongoDB** (`eventos_crudos`) → **F
 
 ## Instrucciones de Ejecución Completa del Pipeline
 
-Sigue estos pasos en orden desde la raíz del proyecto en tu terminal.
+-Sigue estos pasos en orden desde la raíz del proyecto en tu terminal.
 
 **Paso 0: (Opcional) Limpieza Inicial Completa**
 Si deseas empezar desde cero (elimina todos los datos y contenedores previos del proyecto):
@@ -32,21 +32,21 @@ Si deseas empezar desde cero (elimina todos los datos y contenedores previos del
 docker-compose down --volumes 
 
 **Paso 1: Levantar Servicio de Base de Datos**
-Asegúrate de que MongoDB esté corriendo en segundo plano. Si no lo está, o para asegurar:
+  Asegúrate de que MongoDB esté corriendo en segundo plano. Si no lo está, o para asegurar:
 
-docker-compose up -d mongo-storage
+  docker-compose up -d mongo-storage
 
-"Espera unos segundos para que el servicio se inicie y pase el healthcheck."
+  "Espera unos segundos para que el servicio se inicie y pase el healthcheck."
 
 **Paso 2: Recolección de Datos Crudos (Scraper)**
 
 docker-compose up --build scraper
 
-El scraper comenzará a recolectar datos. Por defecto, está configurado para 10,000 eventos.
-
-Monitorea los logs. Una vez que veas el mensaje "Finalizando scraper" o hayas recolectado suficientes datos, puedes detenerlo manualmente con Ctrl + C en esta terminal.
-
-Verificación rápida de datos crudos (en otra terminal):
+  El scraper comenzará a recolectar datos. Por defecto, está configurado para 10,000 eventos.
+  
+  Monitorea los logs. Una vez que veas el mensaje "Finalizando scraper" o hayas recolectado suficientes datos, puedes detenerlo manualmente con Ctrl + C en esta terminal.
+  
+  Verificación rápida de datos crudos (en otra terminal):
 
 docker exec -it mongo-storage mongo
 
