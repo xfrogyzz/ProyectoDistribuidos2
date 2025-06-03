@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mongo-storage:
+    image: mongo:4.4
+    container_name: mongo-storage
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"] 
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  scraper:
+    build: ./web_scraper
+    container_name: scraper
+    depends_on:
+      mongo-storage: 
+        condition: service_healthy
+    volumes:
+      - ./web_scraper:/app 
+
+  filtering-homogenization:
+    build: ./mongo_storage
+    container_name: filtering-homogenization-service
+    depends_on:
+      mongo-storage:
+        condition: service_healthy
+    
+    command: python storage_cleaner.py 
+
+  pig-processor:
+    build: ./pig_processor
+    container_name: pig-processor-service
+    depends_on:
+      mongo-storage:
+        condition: service_healthy
+      
+    environment:
+      - MONGO_HOST=mongo-storage
+      - MONGO_DATABASE=waze_db
+      - MONGO_INPUT_COLLECTION=eventos_homogeneizados 
+      - PIG_SCRIPT_TO_RUN=process_waze_data.pig
+      - MONGO_OUTPUT_COLLECTION_COMUNA=analisis_por_comuna
+      - MONGO_OUTPUT_COLLECTION_TIPO=analisis_por_tipo
+      - MONGO_OUTPUT_COLLECTION_HORA=analisis_por_hora
+      - MONGO_JAVA_DRIVER_VERSION=3.12.14
+      - MONGO_HADOOP_VERSION=2.0.2
+   
+
+volumes:
+  mongo_data:
