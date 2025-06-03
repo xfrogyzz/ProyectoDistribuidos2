@@ -33,53 +33,90 @@ docker-compose down --volumes
 
 **Paso 1: Levantar Servicio de Base de Datos**
 Asegúrate de que MongoDB esté corriendo en segundo plano. Si no lo está, o para asegurar:
+
 docker-compose up -d mongo-storage
+
 "Espera unos segundos para que el servicio se inicie y pase el healthcheck."
 
 **Paso 2: Recolección de Datos Crudos (Scraper)**
+
 docker-compose up --build scraper
+
 El scraper comenzará a recolectar datos. Por defecto, está configurado para 10,000 eventos.
+
 Monitorea los logs. Una vez que veas el mensaje "Finalizando scraper" o hayas recolectado suficientes datos, puedes detenerlo manualmente con Ctrl + C en esta terminal.
+
 Verificación rápida de datos crudos (en otra terminal):
+
 docker exec -it mongo-storage mongo
+
 use waze_db;
+
 db.eventos_crudos.count(); 
+
 exit;
 
 **Paso 3: Filtrado y Homogeneización de Datos**
 docker-compose run --rm filtering-homogenization
+
 Este script procesará eventos_crudos y guardará en eventos_homogeneizados.
+
 Verificación rápida de datos homogeneizados (en otra terminal):
+
 docker exec -it mongo-storage mongo
+
 use waze_db; 
+
 db.eventos_homogeneizados.count(); 
+
 exit;
 
 **Paso 4: Procesamiento con Apache Pig**
 Limpiar colecciones de análisis previas:
+
 docker exec -it mongo-storage mongo
+
 Dentro del shell mongo:
+
 use waze_db;
+
 db.analisis_por_comuna.deleteMany({});
+
 db.analisis_por_tipo.deleteMany({});
+
 db.analisis_por_hora.deleteMany({});
+
 exit;
 
 Ejecutar el procesador Pig:
+
 docker-compose up --build pig-processor
 
 **Paso 5: Verificación de Resultados del Análisis Final**
+
 docker exec -it mongo-storage mongo
+
 Dentro del shell mongo:
+
 use waze_db;
+
 print("--- Análisis por Comuna ---");
+
 printjson(db.analisis_por_comuna.find().toArray());
+
 print("Conteo: " + db.analisis_por_comuna.count());
+
 print("--- Análisis por Tipo de Incidente ---");
+
 printjson(db.analisis_por_tipo.find().toArray());
+
 print("Conteo: " + db.analisis_por_tipo.count());
+
 print("--- Análisis por Hora del Día ---");
+
 printjson(db.analisis_por_hora.find().toArray());
+
 print("Conteo: " + db.analisis_por_hora.count());
+
 exit;
 
